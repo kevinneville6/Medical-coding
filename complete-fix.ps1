@@ -1,4 +1,32 @@
-﻿from fastapi import FastAPI, HTTPException
+﻿Write-Host "=== COMPLETE DEPLOYMENT FIX ===" -ForegroundColor Cyan
+
+# Backup current files
+Write-Host "`n1. Backing up current files..." -ForegroundColor Yellow
+if (Test-Path "main.py") {
+    Copy-Item "main.py" "main-backup.py" -Force
+    Write-Host "   ✓ Backed up main.py" -ForegroundColor Green
+}
+
+# Fix 1: Set Python to 3.11
+Write-Host "`n2. Setting Python version to 3.11..." -ForegroundColor Yellow
+"python-3.11.0" | Out-File -FilePath "runtime.txt" -Encoding utf8
+Write-Host "   ✓ Updated runtime.txt" -ForegroundColor Green
+
+# Fix 2: Update requirements
+Write-Host "`n3. Updating dependencies..." -ForegroundColor Yellow
+@"
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==1.10.13
+python-dotenv==1.0.0
+python-multipart==0.0.6
+"@ | Out-File -FilePath "requirements.txt" -Encoding utf8
+Write-Host "   ✓ Updated requirements.txt" -ForegroundColor Green
+
+# Fix 3: Create compatible main.py
+Write-Host "`n4. Creating compatible main.py..." -ForegroundColor Yellow
+@"
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import uuid
@@ -134,3 +162,8 @@ if __name__ == "__main__":
     import os
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
+"@ | Out-File -FilePath "main.py" -Encoding utf8
+Write-Host "   ✓ Created compatible main.py" -ForegroundColor Green
+
+Write-Host "`n✅ ALL FIXES APPLIED SUCCESSFULLY!" -ForegroundColor Green
+Write-Host "`nNext: Run the push commands below..." -ForegroundColor Yellow
