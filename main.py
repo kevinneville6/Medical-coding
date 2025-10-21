@@ -1,17 +1,6 @@
 ﻿from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Optional
-import os
 
 app = FastAPI()
-
-class AnalysisRequest(BaseModel):
-    patient_description: str
-
-class AnalysisResponse(BaseModel):
-    status: str
-    message: str
-    report_id: str
 
 @app.get("/")
 def root():
@@ -19,17 +8,19 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "service": "medical-coding-api"}
+    return {"status": "healthy"}
 
 @app.post("/analyze")
-def analyze(request: AnalysisRequest):
+def analyze(patient_description: str):
     return {
-        "status": "success", 
-        "message": "Analysis completed",
-        "report_id": "test-123"
+        "status": "success",
+        "report_id": "docker-123",
+        "analysis": {
+            "summary": "Analysis completed",
+            "cpt_codes": [{"code": "99213", "description": "Office visit"}]
+        }
     }
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
